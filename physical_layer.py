@@ -1,5 +1,3 @@
-# physical_layer.py
-
 class PhysicalLayer:
     def __init__(self):
         self.connections = {}

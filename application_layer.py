@@ -1,5 +1,3 @@
-# application_layer.py
-
 class ApplicationLayer:
     def create_message(self, message):
         return {

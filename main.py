@@ -1,5 +1,3 @@
-# main.py
-
 import tkinter as tk
 from tkinter import Canvas, messagebox
 from device import Device

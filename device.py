@@ -1,5 +1,3 @@
-# device.py
-
 from data_link_config import DataLinkLayerConfig
 from network_layer import NetworkLayer
 from transport_layer import TransportLayer

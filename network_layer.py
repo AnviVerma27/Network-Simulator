@@ -1,5 +1,3 @@
-# network_layer.py
-
 class NetworkLayer:
     def __init__(self):
         self.ip_addresses = {}

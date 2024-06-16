@@ -1,5 +1,3 @@
-# data_link_layer.py
-
 class DataLinkLayer:
     def __init__(self):
         self.mac_addresses = {}
