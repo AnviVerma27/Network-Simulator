@@ -105,6 +105,9 @@ class NetworkSimulatorApp:
         return None
 
     def connect_devices(self, device1_name, device2_name):
+        if device1_name == device2_name:
+            print(f"Cannot connect device {device1_name} to itself.")
+            return
         if device1_name in self.devices and device2_name in self.devices:
             self.physical_layer.add_connection(device1_name, device2_name)
             x1, y1 = self.device_positions[device1_name]
