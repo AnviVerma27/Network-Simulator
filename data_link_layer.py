@@ -3,12 +3,23 @@
 class DataLinkLayer:
     def __init__(self):
         self.mac_addresses = {}
+        self.arp_table = {}
 
     def assign_mac_address(self, device, mac_address):
         self.mac_addresses[device] = mac_address
 
     def get_mac_address(self, device):
         return self.mac_addresses.get(device)
+
+    def update_arp_table(self, ip_address, mac_address):
+        if ip_address in self.arp_table:
+            print(f"[Data Link Layer] ARP entry update skipped: {ip_address} already mapped to {self.arp_table[ip_address]}")
+        else:
+            self.arp_table[ip_address] = mac_address
+            print(f"[Data Link Layer] ARP entry added: {ip_address} -> {mac_address}")
+
+    def get_mac_from_arp(self, ip_address):
+        return self.arp_table.get(ip_address)
 
     def create_frame(self, src_mac, dst_mac, payload):
         print(f"[Data Link Layer] Creating frame with src_mac={src_mac}, dst_mac={dst_mac}, payload={payload}")

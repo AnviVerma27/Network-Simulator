@@ -4,6 +4,10 @@ class PhysicalLayer:
     def __init__(self):
         self.connections = {}
 
+    def remove_device(self, device_name):
+        if device_name in self.connections:
+            del self.connections[device_name]
+
     def add_connection(self, device1, device2):
         if device1 not in self.connections:
             self.connections[device1] = []

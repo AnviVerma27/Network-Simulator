@@ -1,8 +1,9 @@
 # device.py
 
-from data_link_layer import DataLinkLayer
+from data_link_config import DataLinkLayerConfig
 from network_layer import NetworkLayer
 from transport_layer import TransportLayer
+from utils import decode  
 
 class Device:
     def __init__(self, name, device_type, mac_address, ip_address):
@@ -10,7 +11,7 @@ class Device:
         self.device_type = device_type
         self.mac_address = mac_address
         self.ip_address = ip_address
-        self.data_link_layer = DataLinkLayer()
+        self.data_link_layer = DataLinkLayerConfig.get_instance().data_link_layer
         self.network_layer = NetworkLayer()
         self.transport_layer = TransportLayer()
 
@@ -23,7 +24,14 @@ class Device:
         print(f"[{self.name}] Transport Layer: Created segment {segment}")
         packet = self.network_layer.create_packet(self.ip_address, dst_device.ip_address, segment)
         print(f"[{self.name}] Network Layer: Created packet {packet}")
-        frame = self.data_link_layer.create_frame(self.mac_address, dst_device.mac_address, packet)
+        
+        print(self.data_link_layer.arp_table)
+        dst_mac = self.data_link_layer.get_mac_from_arp(dst_device.ip_address)
+        if dst_mac is None:
+            print(f"[{self.name}] ARP Miss: MAC address for IP {dst_device.ip_address} not found.")
+            return
+        
+        frame = self.data_link_layer.create_frame(self.mac_address, dst_mac, packet)
         print(f"[{self.name}] Data Link Layer: Created frame {frame}")
         self.physical_layer_send(dst_device, frame)
 
@@ -38,11 +46,11 @@ class Device:
         if frame_type == 'DATA':
             src_ip, dst_ip, segment = self.network_layer.parse_packet(payload)
             print(f"[{self.name}] Network Layer: Parsed packet, segment {segment}")
-            message = self.transport_layer.parse_segment(segment)
+            encoded_message = self.transport_layer.parse_segment(segment)
+            message = decode(encoded_message)  
             print(f"[{self.name}] Transport Layer: Parsed segment, message '{message}'")
             print(f"[{self.name}] Message received from [{src_device.name}]: {message}")
 
-            # Sending acknowledgment back
             ack_frame = self.data_link_layer.create_ack(self.mac_address, src_mac)
             print(f"[{self.name}] Data Link Layer: Created ACK frame {ack_frame}")
             self.physical_layer_send(src_device, ack_frame)
