@@ -1,9 +1,9 @@
 import tkinter as tk
-from tkinter import Canvas, messagebox
+from tkinter import Canvas,  messagebox, simpledialog
 from device import Device
 from physical_layer import PhysicalLayer
-from data_link_layer import DataLinkLayer
-from network_layer import NetworkLayer
+from data_link_config import DataLinkLayerConfig
+from network_layer_config import NetworkLayerConfig
 from utils import encode
 
 class NetworkSimulatorApp:
@@ -15,8 +15,8 @@ class NetworkSimulatorApp:
 
         self.devices = {}
         self.physical_layer = PhysicalLayer()
-        self.data_link_layer = DataLinkLayer()
-        self.network_layer = NetworkLayer()
+        self.data_link_layer = DataLinkLayerConfig.get_instance().data_link_layer
+        self.network_layer = NetworkLayerConfig.get_instance().network_layer
         self.device_positions = {}
         self.selected_devices = []
 
@@ -50,7 +50,7 @@ class NetworkSimulatorApp:
             device_name = f"{self.device_type}_{len(self.devices)}"
             mac_address = f"00:00:00:00:00:{len(self.devices):02x}"
             ip_address = f"192.168.0.{len(self.devices) + 1}"
-            device = Device(device_name, self.device_type, mac_address, ip_address, self)  # Pass self to Device
+            device = Device(device_name, self.device_type, mac_address, ip_address)  # Pass self to Device
             self.devices[device_name] = device
             self.device_positions[device_name] = (event.x, event.y)
             self.canvas.create_oval(event.x - 10, event.y - 10, event.x + 10, event.y + 10, fill="blue")
@@ -119,22 +119,24 @@ class NetworkSimulatorApp:
             self.data_link_layer.update_arp_table(device1.ip_address, device2.mac_address)
             self.data_link_layer.update_arp_table(device2.ip_address, device1.mac_address)
             
-            # Update routing tables
-            self.network_layer.update_routing_table(device1.ip_address, device2_name)
-            self.network_layer.update_routing_table(device2.ip_address, device1_name)
+            # # Update routing tables
+            # self.network_layer.update_routing_table(device1.ip_address, device2_name)
+            # self.network_layer.update_routing_table(device2.ip_address, device1_name)
 
             print(self.data_link_layer.arp_table)
             print(f"Connected {device1_name} and {device2_name}")
 
     def send_message(self):
-        src_device_name = input("Enter source device name: ")
-        dst_device_name = input("Enter destination device name: ")
-        message = input("Enter message: ")
-        encoded_message = encode(message) 
+        src_device_name = simpledialog.askstring("Source Device", "Enter source device name:")
+        dst_device_name = simpledialog.askstring("Destination Device", "Enter destination device name:")
+        message = simpledialog.askstring("Message", "Enter message:")
+        encoded_message = encode(message)
         if src_device_name in self.devices and dst_device_name in self.devices:
             src_device = self.devices[src_device_name]
             dst_device = self.devices[dst_device_name]
             src_device.send_message(dst_device, encoded_message)
+        else:
+            print("Can not send the message, as either sorce or the destination is missing")
 
 
 if __name__ == "__main__":
