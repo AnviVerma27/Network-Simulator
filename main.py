@@ -2,8 +2,10 @@ import tkinter as tk
 from tkinter import Canvas, messagebox
 from device import Device
 from physical_layer import PhysicalLayer
-from data_link_config import DataLinkLayerConfig
+from data_link_layer import DataLinkLayer
+from network_layer import NetworkLayer
 from utils import encode
+
 class NetworkSimulatorApp:
     def __init__(self, root):
         self.root = root
@@ -13,7 +15,8 @@ class NetworkSimulatorApp:
 
         self.devices = {}
         self.physical_layer = PhysicalLayer()
-        self.data_link_layer = DataLinkLayerConfig.get_instance().data_link_layer
+        self.data_link_layer = DataLinkLayer()
+        self.network_layer = NetworkLayer()
         self.device_positions = {}
         self.selected_devices = []
 
@@ -47,7 +50,7 @@ class NetworkSimulatorApp:
             device_name = f"{self.device_type}_{len(self.devices)}"
             mac_address = f"00:00:00:00:00:{len(self.devices):02x}"
             ip_address = f"192.168.0.{len(self.devices) + 1}"
-            device = Device(device_name, self.device_type, mac_address, ip_address)
+            device = Device(device_name, self.device_type, mac_address, ip_address, self)  # Pass self to Device
             self.devices[device_name] = device
             self.device_positions[device_name] = (event.x, event.y)
             self.canvas.create_oval(event.x - 10, event.y - 10, event.x + 10, event.y + 10, fill="blue")
@@ -110,11 +113,16 @@ class NetworkSimulatorApp:
             self.physical_layer.add_connection(device1_name, device2_name)
             x1, y1 = self.device_positions[device1_name]
             x2, y2 = self.device_positions[device2_name]
-            self.canvas.create_line(x1, y1, x2, y2,fill="black")
+            self.canvas.create_line(x1, y1, x2, y2, fill="black")
             device1 = self.devices[device1_name]
             device2 = self.devices[device2_name]
             self.data_link_layer.update_arp_table(device1.ip_address, device2.mac_address)
             self.data_link_layer.update_arp_table(device2.ip_address, device1.mac_address)
+            
+            # Update routing tables
+            self.network_layer.update_routing_table(device1.ip_address, device2_name)
+            self.network_layer.update_routing_table(device2.ip_address, device1_name)
+
             print(self.data_link_layer.arp_table)
             print(f"Connected {device1_name} and {device2_name}")
 
@@ -127,6 +135,7 @@ class NetworkSimulatorApp:
             src_device = self.devices[src_device_name]
             dst_device = self.devices[dst_device_name]
             src_device.send_message(dst_device, encoded_message)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
