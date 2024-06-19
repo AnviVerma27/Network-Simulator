@@ -21,24 +21,27 @@ class Device:
 
     def send_message(self, dst_device, message, protocol='MSG'):
         print(f"[{self.name}] Sending message to [{dst_device.name}]: {message}")
-        app_message = self.application_layer.create_message(message)
-        segment = self.transport_layer.create_segment(app_message)
-        print(f"[{self.name}] Transport Layer: Created segment {segment}")
-        next_hop_ip = self.network_layer.get_route(dst_device.ip_address)
-        if not next_hop_ip:
-            print(f"[{self.name}] Routing Error: No route to host {dst_device.ip_address}")
-            return
-        packet = self.network_layer.create_packet(self.ip_address, next_hop_ip, segment)
-        print(f"[{self.name}] Network Layer: Created packet {packet}")
-        dst_mac = self.data_link_layer.get_mac_from_arp(next_hop_ip)
-        if dst_mac is None:
+        app_message = self.application_layer.create_message(message, protocol)
+        if protocol == "PING" or protocol == "FILE":
+            test = self.application_layer.parse_message(protocol, app_message)
+            print("#########",test)
+        else:
+            segment = self.transport_layer.create_segment(app_message)
+            print(f"[{self.name}] Transport Layer: Created segment {segment}")
+            next_hop_ip = self.network_layer.get_route(dst_device.ip_address)
+            if not next_hop_ip:
+                print(f"[{self.name}] Routing Error: No route to host {dst_device.ip_address}")
+                return
+            packet = self.network_layer.create_packet(self.ip_address, next_hop_ip, segment)
+            print(f"[{self.name}] Network Layer: Created packet {packet}")
+            dst_mac = self.data_link_layer.get_mac_from_arp(next_hop_ip)
+            if dst_mac is None:
+                print(f"[{self.name}] ARP Miss: MAC address for IP {next_hop_ip} not found.")
+                return
             
-            print(f"[{self.name}] ARP Miss: MAC address for IP {next_hop_ip} not found.")
-            return
-        
-        frame = self.data_link_layer.create_frame(self.mac_address, dst_mac, packet)
-        print(f"[{self.name}] Data Link Layer: Created frame {frame}")
-        self.physical_layer_send(dst_device, frame)
+            frame = self.data_link_layer.create_frame(self.mac_address, dst_mac, packet)
+            print(f"[{self.name}] Data Link Layer: Created frame {frame}")
+            self.physical_layer_send(dst_device, frame)
 
     def physical_layer_send(self, dst_device, frame):
         print(f"[{self.name}] Physical Layer: Sending frame to {dst_device.name}")
