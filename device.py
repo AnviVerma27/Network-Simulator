@@ -1,6 +1,6 @@
 from data_link_config import DataLinkLayerConfig
-# from network_layer_config import NetworkLayerConfig
 from network_layer import NetworkLayer
+from network_layer_config import NetworkLayerConfig
 from transport_layer import TransportLayer
 from application_layer import ApplicationLayer
 from utils import decode
@@ -12,8 +12,7 @@ class Device:
         self.mac_address = mac_address
         self.ip_address = ip_address
         self.data_link_layer = DataLinkLayerConfig.get_instance().data_link_layer
-        self.network_layer = NetworkLayer()
-        # self.network_layer = NetworkLayerConfig.get_instance().network_layer
+        self.network_layer = NetworkLayerConfig.get_instance().network_layer
         self.transport_layer = TransportLayer()
         self.application_layer = ApplicationLayer()
 
@@ -25,30 +24,24 @@ class Device:
         app_message = self.application_layer.create_message(message)
         segment = self.transport_layer.create_segment(app_message)
         print(f"[{self.name}] Transport Layer: Created segment {segment}")
-        packet = self.network_layer.create_packet(self.ip_address, dst_device.ip_address, segment)
+        
+        # Check for route in the routing table
+        next_hop_ip = self.network_layer.get_route(dst_device.ip_address)
+        if not next_hop_ip:
+            print(f"[{self.name}] Routing Error: No route to host {dst_device.ip_address}")
+            return
+        
+        packet = self.network_layer.create_packet(self.ip_address, next_hop_ip, segment)
         print(f"[{self.name}] Network Layer: Created packet {packet}")
         
-        # next_hop_device_name = self.network_layer.get_route(dst_device.ip_address)
-        # if not next_hop_device_name:
-        #     print(f"[{self.name}] No route to destination {dst_device.ip_address}")
-        #     return
-
-        # next_hop_device = None
-        # if next_hop_device_name in self.devices:
-        #     next_hop_device = self.devices[next_hop_device_name]
-        # else:
-        #     print(f"[{self.name}] Next hop {next_hop_device_name} not found in devices.")
-        #     return
-
-        dst_mac = self.data_link_layer.get_mac_from_arp(dst_device.ip_address)
+        dst_mac = self.data_link_layer.get_mac_from_arp(next_hop_ip)
         if dst_mac is None:
-            print(f"[{self.name}] ARP Miss: MAC address for IP {dst_device.ip_address} not found.")
+            print(f"[{self.name}] ARP Miss: MAC address for IP {next_hop_ip} not found.")
             return
         
         frame = self.data_link_layer.create_frame(self.mac_address, dst_mac, packet)
         print(f"[{self.name}] Data Link Layer: Created frame {frame}")
         self.physical_layer_send(dst_device, frame)
-
 
     def physical_layer_send(self, dst_device, frame):
         print(f"[{self.name}] Physical Layer: Sending frame to {dst_device.name}")

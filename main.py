@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import Canvas,  messagebox, simpledialog
+from tkinter import Canvas, messagebox, simpledialog
 from device import Device
 from physical_layer import PhysicalLayer
 from data_link_config import DataLinkLayerConfig
 from network_layer_config import NetworkLayerConfig
+from network_layer import NetworkLayer
 from utils import encode
 
 class NetworkSimulatorApp:
@@ -118,12 +119,11 @@ class NetworkSimulatorApp:
             device2 = self.devices[device2_name]
             self.data_link_layer.update_arp_table(device1.ip_address, device2.mac_address)
             self.data_link_layer.update_arp_table(device2.ip_address, device1.mac_address)
-            
-            # # Update routing tables
-            # self.network_layer.update_routing_table(device1.ip_address, device2_name)
-            # self.network_layer.update_routing_table(device2.ip_address, device1_name)
+            self.network_layer.update_routing_table(device1.ip_address, device2.ip_address)
+            self.network_layer.update_routing_table(device2.ip_address, device1.ip_address)
 
             print(self.data_link_layer.arp_table)
+            print(self.network_layer.routing_table)
             print(f"Connected {device1_name} and {device2_name}")
 
     def send_message(self):
@@ -136,7 +136,7 @@ class NetworkSimulatorApp:
             dst_device = self.devices[dst_device_name]
             src_device.send_message(dst_device, encoded_message)
         else:
-            print("Can not send the message, as either sorce or the destination is missing")
+            print("Can not send the message, as either source or the destination is missing")
 
 
 if __name__ == "__main__":
