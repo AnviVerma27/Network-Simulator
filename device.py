@@ -15,26 +15,23 @@ class Device:
         self.network_layer = NetworkLayerConfig.get_instance().network_layer
         self.transport_layer = TransportLayer()
         self.application_layer = ApplicationLayer()
-
         self.data_link_layer.assign_mac_address(self, mac_address)
         self.network_layer.assign_ip_address(self, ip_address)
         self.network_layer.broadcast_routing_info()  # Broadcast initial routing information using RIP
 
-    def send_message(self, dst_device, message):
+    def send_message(self, dst_device, message, protocol='MSG'):
         print(f"[{self.name}] Sending message to [{dst_device.name}]: {message}")
-        app_message = self.application_layer.create_message(message)
+        app_message = self.application_layer.create_message(message, protocol)
+        test = self.application_layer.parse_message(protocol, app_message)
+        print("#########",test)
         segment = self.transport_layer.create_segment(app_message)
         print(f"[{self.name}] Transport Layer: Created segment {segment}")
-        
-        # Check for route in the routing table
         next_hop_ip = self.network_layer.get_route(dst_device.ip_address)
         if not next_hop_ip:
             print(f"[{self.name}] Routing Error: No route to host {dst_device.ip_address}")
             return
-        
         packet = self.network_layer.create_packet(self.ip_address, next_hop_ip, segment)
         print(f"[{self.name}] Network Layer: Created packet {packet}")
-        
         dst_mac = self.data_link_layer.get_mac_from_arp(next_hop_ip)
         if dst_mac is None:
             print(f"[{self.name}] ARP Miss: MAC address for IP {next_hop_ip} not found.")
@@ -63,6 +60,8 @@ class Device:
             print(f"[{self.name}] Network Layer: Parsed packet, segment {segment}")
             encoded_message = self.transport_layer.parse_segment(segment)
             message = decode(encoded_message.get('message'))
+            protocol = encoded_message.get('protocol')  # Added protocol extraction
+
             print(f"[{self.name}] Transport Layer: Parsed segment, message '{message}'")
             print(f"[{self.name}] Message received from [{src_device.name}]: {message}")
 

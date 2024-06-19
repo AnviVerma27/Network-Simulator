@@ -4,7 +4,6 @@ from device import Device
 from physical_layer import PhysicalLayer
 from data_link_config import DataLinkLayerConfig
 from network_layer_config import NetworkLayerConfig
-from network_layer import NetworkLayer
 from utils import encode
 
 class NetworkSimulatorApp:
@@ -41,7 +40,7 @@ class NetworkSimulatorApp:
         delete_button.pack(side=tk.LEFT)
 
         self.canvas.bind("<Button-1>", self.add_or_select_device)
-        self.canvas.bind("<Button-3>", self.delete_or_disconnect_device)  # Right-click to delete or disconnect
+        self.canvas.bind("<Button-3>", self.delete_or_disconnect_device) 
 
     def set_device_type(self, device_type):
         self.device_type = device_type
@@ -51,7 +50,7 @@ class NetworkSimulatorApp:
             device_name = f"{self.device_type}_{len(self.devices)}"
             mac_address = f"00:00:00:00:00:{len(self.devices):02x}"
             ip_address = f"192.168.0.{len(self.devices) + 1}"
-            device = Device(device_name, self.device_type, mac_address, ip_address)  # Pass self to Device
+            device = Device(device_name, self.device_type, mac_address, ip_address)
             self.devices[device_name] = device
             self.device_positions[device_name] = (event.x, event.y)
             self.canvas.create_oval(event.x - 10, event.y - 10, event.x + 10, event.y + 10, fill="blue")
@@ -130,11 +129,12 @@ class NetworkSimulatorApp:
         src_device_name = simpledialog.askstring("Source Device", "Enter source device name:")
         dst_device_name = simpledialog.askstring("Destination Device", "Enter destination device name:")
         message = simpledialog.askstring("Message", "Enter message:")
+        protocol = simpledialog.askstring("Protocol", "Enter protocol (MSG/PING/FILE):")
         encoded_message = encode(message)
         if src_device_name in self.devices and dst_device_name in self.devices:
             src_device = self.devices[src_device_name]
             dst_device = self.devices[dst_device_name]
-            src_device.send_message(dst_device, encoded_message)
+            src_device.send_message(dst_device, encoded_message, protocol)
         else:
             print("Can not send the message, as either source or the destination is missing")
 
