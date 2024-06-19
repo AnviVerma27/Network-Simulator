@@ -119,8 +119,8 @@ class NetworkSimulatorApp:
             device2 = self.devices[device2_name]
             self.data_link_layer.update_arp_table(device1.ip_address, device2.mac_address)
             self.data_link_layer.update_arp_table(device2.ip_address, device1.mac_address)
-            self.network_layer.update_routing_table(device1.ip_address, device2.ip_address)
-            self.network_layer.update_routing_table(device2.ip_address, device1.ip_address)
+            self.network_layer.update_routing_table(device1.ip_address, device2.ip_address, 1)  
+            self.network_layer.update_routing_table(device2.ip_address, device1.ip_address, 1) 
 
             print(self.data_link_layer.arp_table)
             print(self.network_layer.routing_table)

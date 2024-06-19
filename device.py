@@ -18,6 +18,7 @@ class Device:
 
         self.data_link_layer.assign_mac_address(self, mac_address)
         self.network_layer.assign_ip_address(self, ip_address)
+        self.network_layer.broadcast_routing_info()  # Broadcast initial routing information using RIP
 
     def send_message(self, dst_device, message):
         print(f"[{self.name}] Sending message to [{dst_device.name}]: {message}")
