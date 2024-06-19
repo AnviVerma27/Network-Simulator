@@ -21,9 +21,7 @@ class Device:
 
     def send_message(self, dst_device, message, protocol='MSG'):
         print(f"[{self.name}] Sending message to [{dst_device.name}]: {message}")
-        app_message = self.application_layer.create_message(message, protocol)
-        test = self.application_layer.parse_message(protocol, app_message)
-        print("#########",test)
+        app_message = self.application_layer.create_message(message)
         segment = self.transport_layer.create_segment(app_message)
         print(f"[{self.name}] Transport Layer: Created segment {segment}")
         next_hop_ip = self.network_layer.get_route(dst_device.ip_address)
@@ -60,8 +58,6 @@ class Device:
             print(f"[{self.name}] Network Layer: Parsed packet, segment {segment}")
             encoded_message = self.transport_layer.parse_segment(segment)
             message = decode(encoded_message.get('message'))
-            protocol = encoded_message.get('protocol')  # Added protocol extraction
-
             print(f"[{self.name}] Transport Layer: Parsed segment, message '{message}'")
             print(f"[{self.name}] Message received from [{src_device.name}]: {message}")
 
