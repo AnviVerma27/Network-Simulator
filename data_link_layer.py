@@ -20,11 +20,13 @@ class DataLinkLayer:
         return self.arp_table.get(ip_address)
 
     def create_frame(self, src_mac, dst_mac, payload):
-        print(f"[Data Link Layer] Creating frame with src_mac={src_mac}, dst_mac={dst_mac}, payload={payload}")
+        parity_bit = self.calculate_parity(payload)
+        print(f"[Data Link Layer] Creating frame with src_mac={src_mac}, dst_mac={dst_mac}, payload={payload}, parity={parity_bit}")
         return {
             'src_mac': src_mac,
             'dst_mac': dst_mac,
             'payload': payload,
+            'parity': parity_bit,
             'type': 'DATA'
         }
 
@@ -42,4 +44,20 @@ class DataLinkLayer:
         dst_mac = frame['dst_mac']
         frame_type = frame.get('type')
         payload = frame.get('payload')
+        parity = frame.get('parity')
+
+        if frame_type != 'ACK' and not self.validate_parity(payload, parity):
+            print("[Data Link Layer] Parity check failed.")
+            return None
+
         return src_mac, dst_mac, payload, frame_type
+
+    def calculate_parity(self, payload):
+        if payload is None:
+            raise ValueError("ACK")
+        message = payload.get('segment', {}).get("message")
+        encoded = message['message']
+        return sum(int(bit) for bit in encoded.replace(' ', '')) % 2
+
+    def validate_parity(self, payload, parity):
+        return self.calculate_parity(payload) == parity

@@ -50,6 +50,12 @@ class Device:
     def receive_message(self, frame, src_device):
         print(f"[{self.name}] Physical Layer: Received frame {frame}")
         src_mac, dst_mac, payload, frame_type = self.data_link_layer.parse_frame(frame)
+        if src_mac is None:
+            print(f"[{self.name}] Data Link Layer: Frame corrupted, requesting retransmission")
+            nack_frame = self.data_link_layer.create_nack(self.mac_address, src_mac)
+            self.physical_layer_send(src_device, nack_frame)
+            return
+
         print(f"[{self.name}] Data Link Layer: Parsed frame, payload {payload}")
         if frame_type == 'DATA':
             src_ip, dst_ip, segment = self.network_layer.parse_packet(payload)
