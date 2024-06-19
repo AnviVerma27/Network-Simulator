@@ -128,8 +128,12 @@ class NetworkSimulatorApp:
     def send_message(self):
         src_device_name = simpledialog.askstring("Source Device", "Enter source device name:")
         dst_device_name = simpledialog.askstring("Destination Device", "Enter destination device name:")
-        message = simpledialog.askstring("Message", "Enter message:")
         protocol = simpledialog.askstring("Protocol", "Enter protocol (MSG/PING/FILE):")
+        if protocol == "PING" or protocol == "FILE":
+            message = "PING"
+        else:
+            message = simpledialog.askstring("Message", "Enter message:")
+        
         encoded_message = encode(message)
         if src_device_name in self.devices and dst_device_name in self.devices:
             src_device = self.devices[src_device_name]
