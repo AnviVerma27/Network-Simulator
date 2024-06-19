@@ -121,8 +121,8 @@ class NetworkSimulatorApp:
             self.network_layer.update_routing_table(device1.ip_address, device2.ip_address, 1)  
             self.network_layer.update_routing_table(device2.ip_address, device1.ip_address, 1) 
 
-            print(self.data_link_layer.arp_table)
-            print(self.network_layer.routing_table)
+            # print(self.data_link_layer.arp_table)
+            # print(self.network_layer.routing_table)
             print(f"Connected {device1_name} and {device2_name}")
 
     def send_message(self):

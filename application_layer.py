@@ -15,7 +15,7 @@ class ApplicationLayer:
             return message['message']
 
     def handle_ping(self, message):
-        return f"Ping response: {message}"
+        return f"\n Ping response: {message}"
 
     def handle_file_transfer(self, message):
-        return f"File received: {message}"
+        return f"\n File received: {message}"

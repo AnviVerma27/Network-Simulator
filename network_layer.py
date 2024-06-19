@@ -14,10 +14,10 @@ class NetworkLayer:
             current_next_hop, current_metric = self.routing_table[ip_address]
             if metric < current_metric:
                 self.routing_table[ip_address] = (next_hop, metric)
-                print(f"[Network Layer] Routing table updated: {ip_address} -> {next_hop}, metric={metric}")
+                print(f"[\n Network Layer] Routing table updated: {ip_address} -> {next_hop}, metric={metric}")
         else:
             self.routing_table[ip_address] = (next_hop, metric)
-            print(f"[Network Layer] Routing table entry added: {ip_address} -> {next_hop}, metric={metric}")
+            # print(f"\n [Network Layer] Routing table entry added: {ip_address} -> {next_hop}, metric={metric}")
 
     def get_route(self, dst_ip):
         if dst_ip in self.routing_table:
@@ -26,7 +26,7 @@ class NetworkLayer:
         return None
 
     def create_packet(self, src_ip, dst_ip, segment):
-        print(f"[Network Layer] Creating packet with src_ip={src_ip}, dst_ip={dst_ip}, segment={segment}")
+        print(f"\n [Network Layer] Creating packet with src_ip={src_ip}, dst_ip={dst_ip}, segment={segment}")
         return {
             'src_ip': src_ip,
             'dst_ip': dst_ip,
@@ -34,7 +34,7 @@ class NetworkLayer:
         }
 
     def parse_packet(self, packet):
-        print(f"[Network Layer] Parsing packet {packet}")
+        print(f"\n [Network Layer] Parsing packet {packet}")
         src_ip = packet['src_ip']
         dst_ip = packet['dst_ip']
         segment = packet['segment']
@@ -45,4 +45,9 @@ class NetworkLayer:
             self.send_routing_update(ip, next_hop, metric)
 
     def send_routing_update(self, ip_address, next_hop, metric):
-        print(f"[Network Layer] Sending routing update: {ip_address} -> {next_hop}, metric={metric}")
+        print(f"\n [Network Layer] Sending routing update: {ip_address} -> {next_hop}, metric={metric}")
+
+    def print_routing_table(self):
+        print("***************Routing Table***************")
+        for ip_address, (next_hop, metric) in self.routing_table.items():
+            print(f"  Destination IP: {ip_address} -> Next Hop: {next_hop}")
