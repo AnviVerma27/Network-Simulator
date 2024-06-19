@@ -6,7 +6,7 @@ class TransportLayer:
     def __init__(self):
         self.active_connections = {}
 
-    def create_segment(self, src_port, dst_port, message):
+    def create_segment(self, message, src_port= 80, dst_port = 80):
         print(f"[Transport Layer] Creating segment from port {src_port} to port {dst_port} with message='{message}'")
         if src_port not in self.active_connections:
             self.assign_port(src_port)

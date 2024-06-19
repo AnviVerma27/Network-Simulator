@@ -61,7 +61,7 @@ class Device:
             src_ip, dst_ip, segment = self.network_layer.parse_packet(payload)
             print(f"[{self.name}] Network Layer: Parsed packet, segment {segment}")
             encoded_message = self.transport_layer.parse_segment(segment)
-            message = decode(encoded_message.get('message'))
+            message = decode((encoded_message[2]).get('message'))
             print(f"[{self.name}] Transport Layer: Parsed segment, message '{message}'")
             print(f"[{self.name}] Message received from [{src_device.name}]: {message}")
 
