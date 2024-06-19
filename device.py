@@ -34,6 +34,7 @@ class Device:
         print(f"[{self.name}] Network Layer: Created packet {packet}")
         dst_mac = self.data_link_layer.get_mac_from_arp(next_hop_ip)
         if dst_mac is None:
+            
             print(f"[{self.name}] ARP Miss: MAC address for IP {next_hop_ip} not found.")
             return
         
