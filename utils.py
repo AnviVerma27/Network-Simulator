@@ -18,3 +18,10 @@ def decode(binary_str):
         decoded_chars.append(decoded_char)
     decoded_str = ''.join(decoded_chars)
     return decoded_str
+
+def AccessControl(medium):
+    # CSMA random access control 
+    if medium == 'Idle':
+        return True
+    else:
+        return False

@@ -1,7 +1,7 @@
 class NetworkLayer:
     def __init__(self):
         self.ip_addresses = {}
-        self.routing_table = {}  # Stores {ip_address: (next_hop, metric)}
+        self.routing_table = {}  
 
     def assign_ip_address(self, device, ip_address):
         self.ip_addresses[device] = ip_address
@@ -45,5 +45,4 @@ class NetworkLayer:
             self.send_routing_update(ip, next_hop, metric)
 
     def send_routing_update(self, ip_address, next_hop, metric):
-        # Simulate sending a routing update to all neighbors
         print(f"[Network Layer] Sending routing update: {ip_address} -> {next_hop}, metric={metric}")

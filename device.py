@@ -69,3 +69,6 @@ class Device:
             ack_frame = self.data_link_layer.create_ack(self.mac_address, src_mac)
             print(f"[{self.name}] Data Link Layer: Created ACK frame {ack_frame}")
             self.physical_layer_send(src_device, ack_frame)
+        global medium
+        medium = "idle"
+        print("medium:", medium)

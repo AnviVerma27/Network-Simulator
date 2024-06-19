@@ -1,5 +1,5 @@
 class ApplicationLayer:
-    # Create a message with a specific protocol
+
     def create_message(self, message, protocol='MSG'):
         return {
             'protocol': protocol,

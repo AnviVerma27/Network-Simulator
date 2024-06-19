@@ -4,7 +4,9 @@ from device import Device
 from physical_layer import PhysicalLayer
 from data_link_config import DataLinkLayerConfig
 from network_layer_config import NetworkLayerConfig
-from utils import encode
+from utils import *
+
+medium = 'Idle'
 
 class NetworkSimulatorApp:
     def __init__(self, root):
@@ -12,14 +14,12 @@ class NetworkSimulatorApp:
         self.root.title("Network Simulator")
         self.canvas = Canvas(root, width=800, height=600, bg="white")
         self.canvas.pack(fill="both", expand=True)
-
         self.devices = {}
         self.physical_layer = PhysicalLayer()
         self.data_link_layer = DataLinkLayerConfig.get_instance().data_link_layer
         self.network_layer = NetworkLayerConfig.get_instance().network_layer
         self.device_positions = {}
         self.selected_devices = []
-
         self.device_type = None
         self.create_widgets()
 
@@ -126,21 +126,27 @@ class NetworkSimulatorApp:
             print(f"Connected {device1_name} and {device2_name}")
 
     def send_message(self):
-        src_device_name = simpledialog.askstring("Source Device", "Enter source device name:")
-        dst_device_name = simpledialog.askstring("Destination Device", "Enter destination device name:")
-        protocol = simpledialog.askstring("Protocol", "Enter protocol (MSG/PING/FILE):")
-        if protocol == "PING" or protocol == "FILE":
-            message = "PING"
+        global medium
+        if AccessControl(medium):
+            medium = "Busy"
+            print("Medium: ",medium)
+            src_device_name = simpledialog.askstring("Source Device", "Enter source device name:")
+            dst_device_name = simpledialog.askstring("Destination Device", "Enter destination device name:")
+            protocol = simpledialog.askstring("Protocol", "Enter protocol (MSG/PING/FILE):")
+            if protocol == "PING" or protocol == "FILE":
+                message = "PING"
+            else:
+                message = simpledialog.askstring("Message", "Enter message:")
+            
+            encoded_message = encode(message)
+            if src_device_name in self.devices and dst_device_name in self.devices:
+                src_device = self.devices[src_device_name]
+                dst_device = self.devices[dst_device_name]
+                src_device.send_message(dst_device, encoded_message, protocol)
+            else:
+                print("Can not send the message, as either source or the destination is missing")
         else:
-            message = simpledialog.askstring("Message", "Enter message:")
-        
-        encoded_message = encode(message)
-        if src_device_name in self.devices and dst_device_name in self.devices:
-            src_device = self.devices[src_device_name]
-            dst_device = self.devices[dst_device_name]
-            src_device.send_message(dst_device, encoded_message, protocol)
-        else:
-            print("Can not send the message, as either source or the destination is missing")
+            print("Medium is busy, try sending after some time")
 
 
 if __name__ == "__main__":
